@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Use the StudentController to handle editing the student
     $result = StudentController::editStudent($id, $name, $subject_name, $marks);
-
     // Check the result of the update operation and redirect accordingly
-    if ($result == "duplicate_error") {
+    if ($result === "duplicate_error") {
         header("Location: dashboard.php?error=update_failed_duplicate");
     }elseif ($result) {
+        
         header("Location: dashboard.php?success=student_updated");
     } else {
         header("Location: dashboard.php?error=update_failed");

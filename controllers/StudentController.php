@@ -69,7 +69,6 @@ class StudentController {
         
         if ($count > 0) {
             // Return an error message or handle the duplicate case
-            error_log("Duplicate entry detected for name '$name' and subject '$subject_name' with ID '$id'");
             return "duplicate_error";
         }
 
