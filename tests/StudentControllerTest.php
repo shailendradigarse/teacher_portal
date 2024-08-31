@@ -1,7 +1,12 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use StudentController;
+
+// If StudentController is in the global namespace, remove or comment out the following line:
+// use StudentController; 
+
+// If StudentController is in a namespace, update the use statement accordingly:
+// use YourNamespace\StudentController;
 
 class StudentControllerTest extends TestCase
 {
@@ -15,18 +20,20 @@ class StudentControllerTest extends TestCase
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             subject_name VARCHAR(255) NOT NULL,
-            marks INT NOT NULL
+            marks INT NOT NULL,
+            UNIQUE KEY name_subject (name, subject_name)
         )");
     }
 
-    // public static function tearDownAfterClass(): void
-    // {
-    //     // Clean up after tests, e.g., removing test data
-    //     if (self::$conn) {
-    //         self::$conn->query("DROP TABLE IF EXISTS students");
-    //         self::$conn->close();
-    //     }
-    // }
+    public static function tearDownAfterClass(): void
+    {
+        // Clean up after tests, e.g., removing test data
+        if (self::$conn) {
+            self::$conn->query("TRUNCATE TABLE students");
+            self::$conn->close();
+        }
+    }
+
 
     public function testAddStudent()
     {
@@ -53,31 +60,32 @@ class StudentControllerTest extends TestCase
 
     public function testEditStudent()
     {
-        // Arrange
-        self::$conn->query("INSERT INTO students (name, subject_name, marks) VALUES ('Jane Doe', 'Science', 80)");
-        $studentId = self::$conn->insert_id;
+        // Start transaction
+        self::$conn->begin_transaction();
 
-        $newName = "Jane Smith";
-        $newSubject = "Physics";
-        $newMarks = 95;
+        try {
+            // Arrange
+            self::$conn->query("INSERT INTO students (name, subject_name, marks) VALUES ('Janea Doe', 'Science', 80)");
+            $studentId = self::$conn->insert_id;
 
-        // Act
-        $result = StudentController::editStudent($studentId, $newName, $newSubject, $newMarks);
+            // Test case: Attempt to update to a duplicate record
+            $newName = "Janea Doe"; // Same as existing
+            $newSubject = "Science"; // Same as existing
+            $newMarks = 95;
 
-        // Assert
-        $this->assertTrue($result);
+            // Act
+            $result = StudentController::editStudent($studentId, $newName, $newSubject, $newMarks);
 
-        // Verify that the student's data was updated in the database
-        $stmt = self::$conn->prepare("SELECT * FROM students WHERE id = ?");
-        $stmt->bind_param("i", $studentId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $student = $result->fetch_assoc();
-        $this->assertEquals($newName, $student['name']);
-        $this->assertEquals($newSubject, $student['subject_name']);
-        $this->assertEquals($newMarks, $student['marks']);
+            // Assert
+            $this->assertEquals("duplicate_error", $result, 'Expected duplicate error but got: ' . $result);
 
-        $stmt->close();
+            // Commit transaction
+            self::$conn->commit();
+        } catch (Exception $e) {
+            // Rollback transaction in case of error
+            self::$conn->rollback();
+            throw $e;
+        }
     }
 
     public function testDeleteStudent()

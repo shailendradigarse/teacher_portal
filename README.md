@@ -20,7 +20,7 @@ A robust teacher portal built with PHP, HTML, and JavaScript. The portal include
 
 Before you begin, ensure you have the following installed on your local machine:
 
-- **PHP** (version 7.4 or later)
+- **PHP** (version 8.2 or later)
 - **MySQL** (or MariaDB)
 - **Composer** (PHP package manager)
 - **Apache** or **Nginx** web server
@@ -79,7 +79,7 @@ Before you begin, ensure you have the following installed on your local machine:
     );
 
    -- Insert a sample teacher for testing (use a password hash)
-   INSERT INTO teachers (username, password) VALUES ('test_teacher', '$2y$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'); -- Replace with a real hash
+   INSERT INTO teachers (username, password) VALUES ('test_teacher', '$2y$10$gqbcINyhkRI7g7bM6wpNNuNhAFs43OKpjKYCdhm74QhtI/372ZXC.'); -- Replace with a real hash password is 123456
    ```
 
 3. **Configure database connection**:
@@ -111,7 +111,7 @@ Before you begin, ensure you have the following installed on your local machine:
 
 1. **Start your web server**:
 
-   Ensure that your web server (Apache/Nginx) is running and configured to serve files from the `teacher-portal` directory.
+   Ensure that your web server (Apache/Nginx) is running and configured to serve files from the `teacher_portal` directory.
 
 2. **Access the application**:
 

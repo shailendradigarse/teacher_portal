@@ -19,12 +19,19 @@ include 'templates/header.php';
 <script src="assets/js/app.js"></script>
 <?php include 'templates/footer.php'; ?>
 <!-- Show notification based on query parameters -->
-<?php if (isset($_GET['success']) || isset($_GET['error'])): ?>
-    <script>
-        let message = '';
-        let isError = false;
-        if ('<?php echo isset($_GET['success']); ?>') {
-            switch ('<?php echo $_GET['success']; ?>') {
+<script>
+    // Convert PHP variables to JavaScript
+    var successParam = '<?php echo isset($_GET['success']) ? $_GET['success'] : ''; ?>';
+    var errorParam = '<?php echo isset($_GET['error']) ? $_GET['error'] : ''; ?>';
+    var message = '';
+    var isError = false;
+
+    // Function to handle success or error messages
+    function handleNotification() {
+        // Check if successParam is set and not empty
+        if (successParam) {
+            // Handle success parameter using switch
+            switch (successParam) {
                 case 'student_added':
                     message = 'Student added successfully!';
                     break;
@@ -34,14 +41,36 @@ include 'templates/header.php';
                 case 'student_deleted':
                     message = 'Student deleted successfully!';
                     break;
+                default:
+                    message = 'Unknown success state.';
+                    break;
             }
-        } else if ('<?php echo isset($_GET['error']); ?>') {
-            message = 'An error occurred. Please try again.';
+        } else if (errorParam) {
+
+            switch (errorParam) {
+                case 'update_failed':
+                    message = 'An error occurred while updateing!';
+                    break;
+                case 'update_failed_duplicate':
+                    message = 'An error occurred while updateing! Student already exist';
+                    break;
+                default:
+                    message = 'An error occurred. Please try again.';
+                    break;
+            }
+
             isError = true;
         }
-        showNotification(message, isError);
-
-        // Remove query parameters from the URL to prevent notification from showing on refresh
+        
+        // Show the notification if there is a message
+        if (message) {
+            showNotification(message, isError);
+            
+        }
         window.history.replaceState(null, null, window.location.pathname);
-    </script>
-<?php endif; ?>
+    }
+
+
+    // Call the function when the script loads
+    handleNotification();
+</script>

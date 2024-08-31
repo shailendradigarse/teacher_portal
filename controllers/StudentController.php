@@ -60,6 +60,19 @@ class StudentController {
     // Edit student details
     public static function editStudent($id, $name, $subject_name, $marks) {
         $conn = Database::getConnection();
+        $checkStmt = $conn->prepare("SELECT COUNT(*) FROM students WHERE name = ? AND subject_name = ? AND id != ?");
+        $checkStmt->bind_param("ssi", $name, $subject_name, $id);
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
+        
+        if ($count > 0) {
+            // Return an error message or handle the duplicate case
+            error_log("Duplicate entry detected for name '$name' and subject '$subject_name' with ID '$id'");
+            return "duplicate_error";
+        }
+
         $stmt = $conn->prepare("UPDATE students SET name = ?, subject_name = ?, marks = ? WHERE id = ?");
         $stmt->bind_param("ssii", $name, $subject_name, $marks, $id);
         $success = $stmt->execute();
